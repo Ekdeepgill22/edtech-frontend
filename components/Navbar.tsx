@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-// Mock user data - replace with actual Clerk integration
+// Mock user data for now
 const mockUser = {
   isSignedIn: true,
   firstName: 'John',
@@ -40,7 +40,6 @@ export default function Navbar() {
   };
 
   const handleSignOut = () => {
-    // Replace with actual Clerk sign out
     console.log('Sign out clicked');
   };
 
@@ -112,10 +111,12 @@ export default function Navbar() {
                     </p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
+                  <Link href="/profile">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
