@@ -1,8 +1,9 @@
 'use client';
 
-import { SignIn } from '@clerk/nextjs';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ArrowRight, UserPlus } from 'lucide-react';
 
 export default function Login() {
@@ -18,78 +19,33 @@ export default function Login() {
         </p>
       </div>
 
-      {/* Clerk SignIn Component */}
-      <div className="flex justify-center">
-        <SignIn 
-          redirectUrl="/dashboard"
-          appearance={{
-            elements: {
-              formButtonPrimary: {
-                backgroundColor: '#f97316',
-                '&:hover': {
-                  backgroundColor: '#ea580c',
-                },
-              },
-              card: {
-                backgroundColor: 'transparent',
-                boxShadow: 'none',
-                border: 'none',
-              },
-              headerTitle: {
-                color: '#ffffff',
-                fontSize: '1.5rem',
-                fontWeight: '600',
-              },
-              headerSubtitle: {
-                color: '#9ca3af',
-              },
-              socialButtonsBlockButton: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                },
-              },
-              formFieldInput: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                '&:focus': {
-                  borderColor: '#f97316',
-                  boxShadow: '0 0 0 1px #f97316',
-                },
-                '&::placeholder': {
-                  color: '#9ca3af',
-                },
-              },
-              formFieldLabel: {
-                color: '#ffffff',
-              },
-              footerActionLink: {
-                color: '#f97316',
-                '&:hover': {
-                  color: '#ea580c',
-                },
-              },
-              identityPreviewText: {
-                color: '#ffffff',
-              },
-              identityPreviewEditButton: {
-                color: '#f97316',
-              },
-            },
-            variables: {
-              colorPrimary: '#f97316',
-              colorText: '#ffffff',
-              colorTextSecondary: '#9ca3af',
-              colorBackground: 'transparent',
-              colorInputBackground: 'rgba(255, 255, 255, 0.1)',
-              colorInputText: '#ffffff',
-            },
-          }}
-        />
-      </div>
+      {/* Login Form */}
+      <form className="space-y-4">
+        <div>
+          <Label htmlFor="email" className="text-white">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400/50 focus:ring-orange-400/20"
+          />
+        </div>
+        <div>
+          <Label htmlFor="password" className="text-white">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400/50 focus:ring-orange-400/20"
+          />
+        </div>
+        <Button
+          type="submit"
+          className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold"
+        >
+          Sign In
+        </Button>
+      </form>
 
       {/* Divider */}
       <div className="relative">
@@ -107,8 +63,8 @@ export default function Login() {
           Don't have an account yet?
         </p>
         <Link href="/register">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full border-white/20 text-white hover:bg-white/10 hover:border-orange-400/50 transition-all duration-300 group"
           >
             <UserPlus className="w-4 h-4 mr-2 group-hover:text-orange-400 transition-colors" />
