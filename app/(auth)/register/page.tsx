@@ -33,84 +33,53 @@ export default function Register() {
         </ul>
       </div>
 
-      {/* Clerk SignUp Component */}
-      <div className="flex justify-center">
-        <SignUp 
-          redirectUrl="/dashboard"
-          appearance={{
-            elements: {
-              formButtonPrimary: {
-                backgroundColor: '#f97316',
-                '&:hover': {
-                  backgroundColor: '#ea580c',
-                },
-              },
-              card: {
-                backgroundColor: 'transparent',
-                boxShadow: 'none',
-                border: 'none',
-              },
-              headerTitle: {
-                color: '#ffffff',
-                fontSize: '1.5rem',
-                fontWeight: '600',
-              },
-              headerSubtitle: {
-                color: '#9ca3af',
-              },
-              socialButtonsBlockButton: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                },
-              },
-              formFieldInput: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff',
-                '&:focus': {
-                  borderColor: '#f97316',
-                  boxShadow: '0 0 0 1px #f97316',
-                },
-                '&::placeholder': {
-                  color: '#9ca3af',
-                },
-              },
-              formFieldLabel: {
-                color: '#ffffff',
-              },
-              footerActionLink: {
-                color: '#f97316',
-                '&:hover': {
-                  color: '#ea580c',
-                },
-              },
-              identityPreviewText: {
-                color: '#ffffff',
-              },
-              identityPreviewEditButton: {
-                color: '#f97316',
-              },
-              verificationLinkStatusText: {
-                color: '#ffffff',
-              },
-              verificationLinkStatusIconBox: {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              },
-            },
-            variables: {
-              colorPrimary: '#f97316',
-              colorText: '#ffffff',
-              colorTextSecondary: '#9ca3af',
-              colorBackground: 'transparent',
-              colorInputBackground: 'rgba(255, 255, 255, 0.1)',
-              colorInputText: '#ffffff',
-            },
-          }}
-        />
-      </div>
+      {/* Registration Form */}
+      <form className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="firstName" className="text-white">First Name</Label>
+            <Input
+              id="firstName"
+              type="text"
+              placeholder="John"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400/50 focus:ring-orange-400/20"
+            />
+          </div>
+          <div>
+            <Label htmlFor="lastName" className="text-white">Last Name</Label>
+            <Input
+              id="lastName"
+              type="text"
+              placeholder="Doe"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400/50 focus:ring-orange-400/20"
+            />
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="email" className="text-white">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400/50 focus:ring-orange-400/20"
+          />
+        </div>
+        <div>
+          <Label htmlFor="password" className="text-white">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="Create a password"
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-400/50 focus:ring-orange-400/20"
+          />
+        </div>
+        <Button
+          type="submit"
+          className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white font-semibold"
+        >
+          Create Account
+        </Button>
+      </form>
 
       {/* Divider */}
       <div className="relative">
