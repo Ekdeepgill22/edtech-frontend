@@ -13,7 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useUser, useClerk } from '@clerk/nextjs';
+
+// Mock user data for now
+const mockUser = {
+  isSignedIn: false,
+  firstName: 'John',
+  lastName: 'Doe',
+  imageUrl: '',
+  emailAddress: 'john.doe@example.com'
+};
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
