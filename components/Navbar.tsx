@@ -26,8 +26,6 @@ const mockUser = {
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
 
   const navigationLinks = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -42,15 +40,12 @@ export default function Navbar() {
   };
 
   const handleSignOut = () => {
-    signOut();
+    console.log('Sign out clicked');
   };
 
   const getUserInitials = () => {
-    if (user?.firstName && user?.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`;
-    }
-    if (user?.emailAddresses?.[0]?.emailAddress) {
-      return user.emailAddresses[0].emailAddress[0].toUpperCase();
+    if (mockUser.firstName && mockUser.lastName) {
+      return `${mockUser.firstName[0]}${mockUser.lastName[0]}`;
     }
     return 'U';
   };
