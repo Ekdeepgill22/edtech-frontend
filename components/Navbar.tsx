@@ -182,22 +182,22 @@ export default function Navbar() {
             
             {/* Mobile Authentication */}
             <div className="pt-4 border-t border-white/20">
-              {isSignedIn ? (
+              {mockUser.isSignedIn ? (
                 <div className="space-y-2">
                   <div className="px-3 py-2">
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user?.imageUrl} alt="Profile" />
+                        <AvatarImage src={mockUser.imageUrl} alt="Profile" />
                         <AvatarFallback className="bg-gradient-to-r from-orange-400 to-orange-500 text-white text-sm font-semibold">
                           {getUserInitials()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium text-white">
-                          {user?.firstName} {user?.lastName}
+                          {mockUser.firstName} {mockUser.lastName}
                         </p>
                         <p className="text-xs text-gray-300">
-                          {user?.emailAddresses?.[0]?.emailAddress}
+                          {mockUser.emailAddress}
                         </p>
                       </div>
                     </div>
