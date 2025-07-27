@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // Mock user data for now
 const mockUser = {
-  isSignedIn: false,
+  isSignedIn: true,
   firstName: 'John',
   lastName: 'Doe',
   imageUrl: '',
