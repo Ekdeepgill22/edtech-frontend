@@ -13,15 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
-// Mock user data - replace with actual Clerk integration
-const mockUser = {
-  isSignedIn: true,
-  firstName: 'John',
-  lastName: 'Doe',
-  imageUrl: '',
-  emailAddress: 'john.doe@example.com'
-};
+import { useUser, useClerk } from '@clerk/nextjs';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
