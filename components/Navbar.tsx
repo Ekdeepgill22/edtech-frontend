@@ -18,6 +18,8 @@ import { useUser, useClerk } from '@clerk/nextjs';
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
 
   const navigationLinks = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -32,13 +34,15 @@ export default function Navbar() {
   };
 
   const handleSignOut = () => {
-    // Replace with actual Clerk sign out
-    console.log('Sign out clicked');
+    signOut();
   };
 
   const getUserInitials = () => {
-    if (mockUser.firstName && mockUser.lastName) {
-      return `${mockUser.firstName[0]}${mockUser.lastName[0]}`;
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`;
+    }
+    if (user?.emailAddresses?.[0]?.emailAddress) {
+      return user.emailAddresses[0].emailAddress[0].toUpperCase();
     }
     return 'U';
   };
