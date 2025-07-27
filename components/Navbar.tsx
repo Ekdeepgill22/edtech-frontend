@@ -86,7 +86,7 @@ export default function Navbar() {
 
           {/* Desktop Authentication */}
           <div className="hidden md:flex items-center space-x-4">
-            {isSignedIn ? (
+            {mockUser.isSignedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -94,7 +94,7 @@ export default function Navbar() {
                     className="relative h-10 w-10 rounded-full hover:bg-white/10 transition-colors duration-200"
                   >
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.imageUrl} alt="Profile" />
+                      <AvatarImage src={mockUser.imageUrl} alt="Profile" />
                       <AvatarFallback className="bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold">
                         {getUserInitials()}
                       </AvatarFallback>
@@ -104,10 +104,10 @@ export default function Navbar() {
                 <DropdownMenuContent className="w-56 mt-2" align="end">
                   <div className="px-3 py-2">
                     <p className="text-sm font-medium text-gray-900">
-                      {user?.firstName} {user?.lastName}
+                      {mockUser.firstName} {mockUser.lastName}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {user?.emailAddresses?.[0]?.emailAddress}
+                      {mockUser.emailAddress}
                     </p>
                   </div>
                   <DropdownMenuSeparator />
