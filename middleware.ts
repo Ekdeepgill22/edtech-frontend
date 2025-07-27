@@ -1,27 +1,25 @@
-import { authMiddleware } from '@clerk/nextjs';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-export default authMiddleware({
-  // Public routes that don't require authentication
-  publicRoutes: ['/', '/login', '/register'],
+const isPublicRoute = createRouteMatcher(['/', '/login', '/register']);
 
-  // Routes that should redirect to sign-in if not authenticated
-  afterAuth(auth, req, evt) {
-    // Handle users who aren't authenticated
-    if (!auth.userId && !auth.isPublicRoute) {
-      return new Response(null, {
-        status: 302,
-        headers: { Location: '/login' },
-      });
-    }
+export default clerkMiddleware((auth, req) => {
+  // Allow access to public routes
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
 
-    // Redirect logged in users to dashboard if they visit auth pages
-    if (auth.userId && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/register')) {
-      return new Response(null, {
-        status: 302,
-        headers: { Location: '/dashboard' },
-      });
-    }
-  },
+  // Redirect unauthenticated users to login
+  if (!auth().userId) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  // Redirect authenticated users away from auth pages
+  if (auth().userId && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/register')) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+
+  return NextResponse.next();
 });
 
 export const config = {
