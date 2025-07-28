@@ -17,10 +17,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 // Mock user data for now
 const mockUser = {
   isSignedIn: true,
-  firstName: 'John',
-  lastName: 'Doe',
+  firstName: 'Priya',
+  lastName: 'Sharma',
   imageUrl: '',
-  emailAddress: 'john.doe@example.com'
+  emailAddress: 'priya.sharma@example.com'
 };
 
 export default function Navbar() {
@@ -60,7 +60,7 @@ export default function Navbar() {
             className="flex items-center space-x-2 group transition-transform duration-200 hover:scale-105"
           >
             <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-sm">S</span>
+              <span className="text-white font-bold text-sm">SS</span>
             </div>
             <span className="text-xl font-bold text-white font-inter tracking-tight">
               ScribbleSense

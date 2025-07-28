@@ -16,7 +16,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  User
+  User,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +41,11 @@ export default function Practice() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasContext, setCanvasContext] = useState<CanvasRenderingContext2D | null>(null);
   
+  // OCR states
+  const [ocrResult, setOcrResult] = useState<string>('');
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrError, setOcrError] = useState<string>('');
+  
   // Voice recording states
   const [selectedLanguage, setSelectedLanguage] = useState('english');
   const [isRecording, setIsRecording] = useState(false);
@@ -47,7 +53,15 @@ export default function Practice() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [transcription, setTranscription] = useState('');
-  const [recordingStatus, setRecordingStatus] = useState<'idle' | 'recording' | 'stopped' | 'saved'>('idle');
+ const [recordingStatus, setRecordingStatus] = useState<
+  'idle' | 'recording' | 'stopped' | 'saved' | 'processing' | 'error'
+>('idle');
+const languages = [
+  { value: 'english', label: 'English', flag: '🇺🇸' },
+  { value: 'hindi', label: 'Hindi', flag: '🇮🇳' },
+  { value: 'punjabi', label: 'Punjabi', flag: '🇮🇳' },
+];
+
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -72,9 +86,14 @@ export default function Practice() {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         setCanvasContext(ctx);
+        
+        // Set canvas background to dark for better visibility
+        ctx.fillStyle = '#1a1b4b';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
     }
   }, []);
@@ -112,33 +131,76 @@ export default function Practice() {
     );
   }
 
-  // Handwriting functions
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+    if (!file) return;
+
+    setUploadedFile(file);
+    setOcrResult('');
+    setOcrError('');
+
+    // Create preview URL
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+
+    // Auto-submit for OCR
+    await submitFileToOCR(file);
+  };
+
+  const submitFileToOCR = async (file: File) => {
+    setOcrLoading(true);
+    setOcrError('');
+
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('language', 'en');
+
+    try {
+      const response = await fetch('http://localhost:5000/api/ocr', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log('✅ OCR Result from file:', data);
+
+      if (data.success) {
+        setOcrResult(data.data.extractedText || 'No text detected in the image.');
+      } else {
+        setOcrError(data.message || 'OCR processing failed.');
+      }
+    } catch (error) {
+      console.error('❌ OCR Error:', error);
+      setOcrError('Failed to connect to OCR service. Please try again.');
+    } finally {
+      setOcrLoading(false);
     }
+  };
+
+  // Fixed canvas drawing functions
+  const getMousePos = (canvas: HTMLCanvasElement, event: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (event.clientX - rect.left) * scaleX,
+      y: (event.clientY - rect.top) * scaleY
+    };
   };
 
   const startDrawing = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!canvasContext) return;
+    if (!canvasContext || !canvasRef.current) return;
     setIsDrawing(true);
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      canvasContext.beginPath();
-      canvasContext.moveTo(event.clientX - rect.left, event.clientY - rect.top);
-    }
+    const pos = getMousePos(canvasRef.current, event);
+    canvasContext.beginPath();
+    canvasContext.moveTo(pos.x, pos.y);
   };
 
   const draw = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !canvasContext) return;
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      canvasContext.lineTo(event.clientX - rect.left, event.clientY - rect.top);
-      canvasContext.stroke();
-    }
+    if (!isDrawing || !canvasContext || !canvasRef.current) return;
+    const pos = getMousePos(canvasRef.current, event);
+    canvasContext.lineTo(pos.x, pos.y);
+    canvasContext.stroke();
   };
 
   const stopDrawing = () => {
@@ -147,7 +209,10 @@ export default function Practice() {
 
   const clearCanvas = () => {
     if (canvasContext && canvasRef.current) {
-      canvasContext.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      canvasContext.fillStyle = '#1a1b4b';
+      canvasContext.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      setOcrResult('');
+      setOcrError('');
     }
   };
 
@@ -159,6 +224,46 @@ export default function Practice() {
       link.href = dataUrl;
       link.click();
     }
+  };
+
+  const submitCanvasToOCR = async () => {
+    if (!canvasRef.current) return;
+
+    setOcrLoading(true);
+    setOcrError('');
+
+    canvasRef.current.toBlob(async (blob) => {
+      if (!blob) {
+        setOcrError('Failed to convert canvas to image.');
+        setOcrLoading(false);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', blob, 'drawing.png');
+      formData.append('language', 'en');
+
+      try {
+        const response = await fetch('http://localhost:5000/api/ocr', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+        console.log('🖋️ OCR Result from Canvas:', data);
+
+        if (data.success) {
+          setOcrResult(data.data.extractedText || 'No text detected in the drawing.');
+        } else {
+          setOcrError(data.message || 'OCR processing failed.');
+        }
+      } catch (error) {
+        console.error('❌ Canvas OCR Error:', error);
+        setOcrError('Failed to connect to OCR service. Please try again.');
+      } finally {
+        setOcrLoading(false);
+      }
+    }, 'image/png');
   };
 
   // Voice recording functions
@@ -232,29 +337,46 @@ export default function Practice() {
     }
   };
 
-  const transcribeAudio = () => {
-    // Simulate transcription - replace with actual API call
-    setTranscription('Loading transcription...');
-    setTimeout(() => {
-      const mockTranscriptions = {
-        english: "Hello, this is a sample transcription of your English speech. The AI has converted your voice to text successfully.",
-        hindi: "नमस्ते, यह आपके हिंदी भाषण का एक नमूना प्रतिलेखन है। AI ने आपकी आवाज़ को सफलतापूर्वक टेक्स्ट में बदल दिया है।",
-        punjabi: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ, ਇਹ ਤੁਹਾਡੇ ਪੰਜਾਬੀ ਭਾਸ਼ਣ ਦਾ ਇੱਕ ਨਮੂਨਾ ਪ੍ਰਤਿਲੇਖਨ ਹੈ। AI ਨੇ ਤੁਹਾਡੀ ਆਵਾਜ਼ ਨੂੰ ਸਫਲਤਾਪੂਰਵਕ ਟੈਕਸਟ ਵਿੱਚ ਬਦਲ ਦਿੱਤਾ ਹੈ।"
-      };
-      setTranscription(mockTranscriptions[selectedLanguage as keyof typeof mockTranscriptions]);
-      setRecordingStatus('saved');
-    }, 2000);
-  };
+const transcribeAudio = async () => {
+  if (!audioBlob) {
+    setTranscription('❌ No audio recorded yet.');
+    return;
+  }
 
-  const languages = [
-    { value: 'english', label: 'English', flag: '🇺🇸' },
-    { value: 'hindi', label: 'Hindi', flag: '🇮🇳' },
-    { value: 'punjabi', label: 'Punjabi', flag: '🇮🇳' }
-  ];
+  setRecordingStatus('processing');
+  setTranscription('🔄 Transcribing...');
+
+  const formData = new FormData();
+  formData.append('audio', audioBlob);
+  formData.append('language', selectedLanguage); // 'english', 'hindi', or 'punjabi'
+
+  try {
+    const response = await fetch('http://localhost:5000/api/speech', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setTranscription(data.transcription || '✅ Transcription complete but empty.');
+      setRecordingStatus('saved');
+    } else {
+      setTranscription(`❌ Transcription failed: ${data.message}`);
+      setRecordingStatus('error');
+    }
+  } catch (error) {
+    console.error('❌ Transcription Error:', error);
+    setTranscription('❌ An error occurred during transcription.');
+    setRecordingStatus('error');
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0b0c2a] via-[#1a1b4b] to-[#2b00b5] py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold text-white mb-4">Practice Session</h1>
@@ -272,7 +394,7 @@ export default function Practice() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               {/* Image Upload */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-white">📤 Upload Image</h3>
@@ -309,47 +431,43 @@ export default function Practice() {
                 )}
               </div>
 
-              {/* Live Writing Pad */}
+
+              {/* OCR Results */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-white">✍️ Live Writing Pad</h3>
-                <div className="bg-black/20 rounded-lg p-4 border border-white/20">
-                  <canvas
-                    ref={canvasRef}
-                    width={400}
-                    height={300}
-                    className="w-full h-64 bg-white/10 rounded cursor-crosshair"
-                    onMouseDown={startDrawing}
-                    onMouseMove={draw}
-                    onMouseUp={stopDrawing}
-                    onMouseLeave={stopDrawing}
-                  />
-                  <div className="flex space-x-2 mt-4">
-                    <Button
-                      onClick={clearCanvas}
-                      variant="outline"
-                      size="sm"
-                      className="border-white/20 text-white hover:bg-white/10"
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      Clear
-                    </Button>
-                    <Button
-                      onClick={saveCanvas}
-                      size="sm"
-                      className="bg-orange-500 hover:bg-orange-600 text-white"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      Save
-                    </Button>
-                  </div>
+                <h3 className="text-lg font-semibold text-white">📄 Text Recognition Results</h3>
+                <div className="bg-white/5 rounded-lg border border-white/20 p-6 min-h-[300px]">
+                  {ocrLoading ? (
+                    <div className="text-center py-8">
+                      <Loader2 className="w-8 h-8 border-orange-400 animate-spin mx-auto mb-4" />
+                      <p className="text-gray-300">Processing your handwriting...</p>
+                    </div>
+                  ) : ocrError ? (
+                    <div className="text-center py-8">
+                      <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-4" />
+                      <p className="text-red-400 font-medium mb-2">Error</p>
+                      <p className="text-gray-300 text-sm">{ocrError}</p>
+                    </div>
+                  ) : ocrResult ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2 text-green-400">
+                        <CheckCircle className="w-5 h-5" />
+                        <span className="font-medium">Text Extracted Successfully</span>
+                      </div>
+                      <div className="bg-black/20 rounded p-4 border border-white/10">
+                        <p className="text-white font-light leading-relaxed whitespace-pre-wrap">
+                          {ocrResult}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-400 font-light py-8">
+                      <FileImage className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Upload an image or draw something to see the extracted text here...</p>
+                      <p className="text-sm mt-2">Our AI will analyze and convert your handwriting to digital text.</p>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-
-            <div className="text-center">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg">
-                Submit Handwriting
-              </Button>
             </div>
           </CardContent>
         </Card>

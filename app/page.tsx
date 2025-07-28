@@ -84,10 +84,10 @@ export default function LandingPage() {
       rating: 5
     },
     {
-      name: "Rajesh Kumar",
+      name: "Karan Singh",
       language: "Punjabi",
       quote: "The voice practice feature is amazing. I can now speak English with much more confidence.",
-      avatar: "RK",
+      avatar: "KS",
       rating: 5
     },
     {
@@ -401,7 +401,7 @@ export default function LandingPage() {
           
           <div className="pt-8 border-t border-white/10 text-center">
             <p className="text-gray-400">
-              © 2024 ScribbleSense. All rights reserved. Built with ❤️ for multilingual learners.
+              © 2025 ScribbleSense. All rights reserved. Built with ❤️ for multilingual learners.
             </p>
           </div>
         </div>

@@ -33,7 +33,7 @@ const mockUser = {
   isAuthenticated: true,
   name: 'Priya Sharma',
   email: 'priya@example.com',
-  joinDate: '2024-01-15'
+  joinDate: '2025-07-15'
 };
 
 // Mock data for charts and stats
@@ -209,7 +209,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-white font-medium text-sm">{mockUser.name}</p>
-                <p className="text-gray-400 text-xs">Member since Jan 2024</p>
+                <p className="text-gray-400 text-xs">Member since July 2025</p>
               </div>
             </div>
           </div>

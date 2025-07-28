@@ -29,11 +29,11 @@ import {
 // Mock user data - in real implementation, this would come from Clerk or your auth system
 const mockUser = {
   id: '1',
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john.doe@example.com',
+  firstName: 'Priya',
+  lastName: 'Sharma',
+  email: 'priya.sharma@example.com',
   imageUrl: '',
-  joinedDate: '2024-01-15',
+  joinedDate: '2025-07-15',
   preferences: {
     language: 'english',
     theme: 'dark',
@@ -389,7 +389,7 @@ export default function ProfilePage() {
         {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-gray-500 text-sm">
-            Need help? Visit our <Link href="/resources" className="text-orange-400 hover:text-orange-300">Help Center</Link> or contact support.
+            Need help? Contact support.
           </p>
         </div>
       </div>
